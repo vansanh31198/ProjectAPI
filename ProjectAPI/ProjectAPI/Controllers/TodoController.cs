@@ -1,25 +1,33 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ProjectAPI.Application.Services.Abstractions;
 using ProjectAPI.Context;
+using ProjectAPI.Library.Extensions;
 using ProjectAPI.Model;
 namespace ProjectAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class TodoController : ControllerBase
 {
     private readonly ILogger<TodoController> _logger;
-    private readonly ToDoDB _toDoDB;
-    public TodoController(ILogger<TodoController> logger, ToDoDB toDoDB)
+    private IConfiguration _configuration;
+    private ITodoService _todoService;
+    public TodoController(ILogger<TodoController> logger,ITodoService todoService, IConfiguration configuration)
     {
         _logger = logger;
-        _toDoDB = toDoDB;
+        _configuration = configuration;
+        _todoService = todoService;
     }
 
     [HttpGet(Name = "GetToDo")]
-    public async Task<ActionResult<IEnumerable<Todo>>> Get()
+    public async Task<IResult> Get()
     {
-        var todos = await _toDoDB.Todos.ToListAsync();
-        return Ok(todos);
-    }
+        var todos = await _todoService.GetAllTodos();
+        _logger.DebugNew("Test bug");
+
+        return TypedResults.Ok(todos.ToList());
+    } 
 }

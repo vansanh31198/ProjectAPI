@@ -1,4 +1,4 @@
-﻿namespace ProjectAPI.Model
+﻿namespace ProjectAPI.Domain.Entities
 {
     public class Todo
     {
